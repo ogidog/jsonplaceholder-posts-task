@@ -41,9 +41,14 @@ export const Pagination = () => {
     const dispatch = useDispatch();
     const pages = useMemo(() => Array.from(Array(Math.ceil(postCounter / POSTS_PER_PAGE)).keys()), [postCounter]);
 
-    const clickHandle = (event: React.MouseEvent<HTMLDivElement>,) => {
+    const pageClickHandler = (event: React.MouseEvent<HTMLDivElement>) => {
         const targetDiv = event.target as HTMLDivElement;
         dispatch(setPageNumber(Number(targetDiv.dataset["pageNumber"])))
+    }
+
+    const navigatorClickHandler = (move: "start" | "end") => {
+        if (move === "start") dispatch(setPageNumber(0));
+        if (move === "end") dispatch(setPageNumber(pages.length - 1));
     }
 
     const setVisiblePages = () => {
@@ -73,12 +78,14 @@ export const Pagination = () => {
 
         const visiblePages = visiblePagesNumbers.map(item => {
             return <PageButton key={item} selected={item === selectedPageNumber} data-page-number={item}
-                               onClick={clickHandle}>{item + 1}</PageButton>
+                               onClick={pageClickHandler}>{item + 1}</PageButton>
         });
-        visiblePages.push(<PageNavigatorButton>{">>"}</PageNavigatorButton>)
+        visiblePages.push(<PageNavigatorButton
+            onClick={(event) => navigatorClickHandler("end")}>{">>"}</PageNavigatorButton>)
 
         if (visiblePagesNumbers[0] >= 1) {
-            visiblePages.unshift(<PageNavigatorButton>{"<<"}</PageNavigatorButton>)
+            visiblePages.unshift(<PageNavigatorButton
+                onClick={(event) => navigatorClickHandler("start")}>{"<<"}</PageNavigatorButton>)
         }
         if (visiblePagesNumbers.at(-1) >= pages.length - 1) {
             visiblePages.pop();
